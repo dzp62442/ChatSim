@@ -1,9 +1,13 @@
-import openai 
+from openai import OpenAI
 from termcolor import colored
 import traceback
-import openai
 import random
 import os 
+
+client = OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+    base_url = os.environ.get("OPENAI_API_URL")
+)
 
 class AssetSelectAgent:
     def __init__(self, config):
@@ -51,12 +55,12 @@ class AssetSelectAgent:
 
             prompt_list = [q0,q1,q2,q3,q4,q5,q6]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "system", "content": "You are an assistant helping me to determine a car's color and type."}] + \
                     [{"role": "user", "content": q} for q in prompt_list]
             )
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[Asset Agent LLM] deciding asset type and color', color='magenta', attrs=['bold'])} \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
@@ -107,13 +111,13 @@ class AssetSelectAgent:
 
             prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7,q8,q9]
             
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me modify and return dictionaries."}] + \
                             [{"role": "user", "content": q} for q in prompt_list]
             )
 
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[Asset Select Agent LLM] revising added cars', color='magenta', attrs=['bold'])}  \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")

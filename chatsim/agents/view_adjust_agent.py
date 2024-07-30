@@ -1,9 +1,14 @@
-import openai 
+import os
+from openai import OpenAI
 import numpy as np
 from termcolor import colored
 import traceback
-import openai
 from chatsim.background.mcnerf.scripts.inter_poses import inter_poses
+
+client = OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+    base_url = os.environ.get("OPENAI_API_URL")
+)
 
 class ViewAdjustAgent:
     def __init__(self, config):
@@ -19,7 +24,7 @@ class ViewAdjustAgent:
             q3 = "I will give you some examples. <user>: Rotate the viewpoint 30 degrees to the left, you should return {'if_view_motion':0}. " + \
                  "<user>: viewpoint moves ahead slowly, you should return {'if_view_motion':1}. "
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me to provide information and ultimately return a JSON dictionary."},
                     {"role": "user", "content": q0},
@@ -30,7 +35,7 @@ class ViewAdjustAgent:
                     ]
             )
 
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[View Adjust Agent LLM] reasoning the view motion', color='magenta', attrs=['bold'])}  \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
@@ -63,7 +68,7 @@ class ViewAdjustAgent:
             q3 = "I will give you some examples. <user>: ego vehicle moves forward, you should return {'speed':'fast'}. " + \
                  "<user>: ego vehicle drives ahead slowly, you should return {'speed':'slow'}. "
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me to provide information and ultimately return a JSON dictionary."},
                     {"role": "user", "content": q0},
@@ -74,7 +79,7 @@ class ViewAdjustAgent:
                     ]
             )
 
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[View Adjust Agent LLM] generating the ego motion', color='magenta', attrs=['bold'])}  \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
@@ -112,7 +117,7 @@ class ViewAdjustAgent:
                  "<user>: move the viewpoint to the right by 1" + \
                  "<assistant>: {\n  'x': 0,\n  'y': -1,\n  'z': 0,\n  'theta': 0,\n} "
             
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me to provide information and ultimately return a JSON dictionary."},
                     {"role": "user", "content": q0},
@@ -123,7 +128,7 @@ class ViewAdjustAgent:
                     ]
             )
 
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[View Adjust Agent LLM] analyzing view change', color='magenta', attrs=['bold'])}  \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")

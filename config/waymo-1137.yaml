@@ -12,7 +12,7 @@ scene:
   pcd_file: 'point_cloud/000_TOP.ply' # first frame's point cloud file
 
   is_wide_angle: &is_wide_angle true  # whether rendering wide angle images (Width -> 3x Width)
-  frames: 50                          # number of frames to render
+  frames: 5                          # number of frames to render
   fps: 5                             # fps of the output video
   multi_process_num: 5                       # multiple process num of foreground rendering
   depth_and_occlusion: false                # whether the foreground rendering process considering depth and occlusion

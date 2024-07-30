@@ -1,8 +1,13 @@
-import openai 
+import os
+from openai import OpenAI
 import traceback
 import copy
-import openai
 from termcolor import colored
+
+client = OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+    base_url = os.environ.get("OPENAI_API_URL")
+)
 
 class ProjectManager:
     def __init__(self, config):
@@ -56,12 +61,12 @@ class ProjectManager:
 
         prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12]
 
-        result = openai.ChatCompletion.create(
+        result = client.chat.completions.create(
             model="gpt-4-turbo-preview",
             messages=[{"role": "system", "content": "You are an assistant helping me to break down the operations."}] + \
                      [{"role": "user", "content": q} for q in prompt_list]
         )
-        answer = result['choices'][0]['message']['content']
+        answer = result.choices[0].message.content
         
         print(f"{colored('[User prompt]', color='magenta', attrs=['bold'])} {user_prompt}\n")
         print(f"{colored('[Project Manager] decomposing tasks', color='magenta', attrs=['bold'])} \
@@ -118,13 +123,13 @@ class ProjectManager:
         q8 = task
 
         prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7,q8]
-        result = openai.ChatCompletion.create(
+        result = client.chat.completions.create(
                     model="gpt-4",
                     messages=[{"role": "system", "content": "You are an assistant helping me to classify operations."}] + \
                              [{"role": "user", "content": q} for q in prompt_list]
                 )
                 
-        answer = result['choices'][0]['message']['content']
+        answer = result.choices[0].message.content
 
         print(f"{colored('[Project Manager] dispatching each task', color='magenta', attrs=['bold'])} \
                 \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")

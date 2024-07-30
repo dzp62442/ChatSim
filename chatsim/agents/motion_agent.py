@@ -1,8 +1,8 @@
-import openai 
+import os
+from openai import OpenAI
 import numpy as np
 from termcolor import colored
 import traceback
-import openai
 import random
 from copy import deepcopy
 from chatsim.foreground.motion_tools.placement_and_motion import vehicle_motion
@@ -11,7 +11,10 @@ from chatsim.foreground.motion_tools.tools import transform_node_to_lane
 from chatsim.foreground.motion_tools.check_collision import check_collision_and_revise_dynamic
 from chatsim.agents.utils import interpolate_uniformly
 
-
+client = OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+    base_url = os.environ.get("OPENAI_API_URL")
+)
 
 class MotionAgent:
     def __init__(self, config):
@@ -41,12 +44,12 @@ class MotionAgent:
             
             prompt_list = [q0,q1,q2,q3,q4,q5]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "system", "content": "You are an assistant helping me to extract information from the operations."}] + \
                      [{"role": "user", "content": q} for q in prompt_list]
             )
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[Motion Agent LLM] analyzing insertion scene dependency ', color='magenta', attrs=['bold'])} \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
@@ -91,12 +94,12 @@ class MotionAgent:
 
             prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7,q8]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "system", "content": "You are an assistant helping me to determine how to place a car."}] + \
                         [{"role": "user", "content": q} for q in prompt_list]
             )
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[Motion Agent LLM] deciding scene-independent object placement', color='magenta', attrs=['bold'])} \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
@@ -143,12 +146,12 @@ class MotionAgent:
 
             prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7,q8,q9]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "system", "content": "You are an assistant helping me to determine how to place a car."}] + \
                         [{"role": "user", "content": q} for q in prompt_list]
             )
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
             print(f"{colored('[Motion Agent LLM] deciding scene-dependent object placement', color='magenta', attrs=['bold'])} \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
 
@@ -193,12 +196,12 @@ class MotionAgent:
 
             prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7,q8]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me to assess the motion situation for adding vehicles."}] + \
                         [{"role": "user", "content": q} for q in prompt_list]
             )
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[Motion Agent LLM] finding motion prior', color='magenta', attrs=['bold'])} \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")

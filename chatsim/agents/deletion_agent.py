@@ -1,14 +1,18 @@
-import openai 
+from openai import OpenAI
 import numpy as np
 from termcolor import colored
 import traceback
-import openai
 import os
 import cv2
 import imageio.v2 as imageio
 import copy
 import sys
 from chatsim.agents.utils import check_and_mkdirs, transform_nerf2opencv_convention, generate_vertices, get_outlines
+
+client = OpenAI(
+    api_key = os.environ.get("OPENAI_API_KEY"),
+    base_url = os.environ.get("OPENAI_API_URL")
+)
 
 class DeletionAgent:
     def __init__(self, config):
@@ -44,13 +48,13 @@ class DeletionAgent:
             
             prompt_list = [q0,q1,q2,q3,q4,q5,q6,q7]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me to assess and maintain information in a dictionary."}] + \
                          [{"role": "user", "content": q} for q in prompt_list]
             )   
 
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
             print(f"{colored('[Deletion Agent LLM] finding the car to delete', color='magenta', attrs=['bold'])} \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
 
@@ -90,13 +94,13 @@ class DeletionAgent:
 
             prompt_list = [q0, q1, q2, q3, q4, q5]
 
-            result = openai.ChatCompletion.create(
+            result = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "system", "content": "You are an assistant helping me maintain and return dictionaries."}] + \
                          [{"role": "user", "content": q} for q in prompt_list]
             )
 
-            answer = result['choices'][0]['message']['content']
+            answer = result.choices[0].message.content
 
             print(f"{colored('[Deletion Agent LLM] finding the car to be put back', color='magenta', attrs=['bold'])}  \
                     \n{colored('[Raw Response>>>]', attrs=['bold'])} {answer}")
